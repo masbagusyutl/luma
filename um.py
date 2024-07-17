@@ -44,8 +44,11 @@ def main():
         status_code, response_json = send_request(init_data)
         
         if status_code == 200:
-            balance = response_json.get('balance', 'N/A')
-            print(f"Successful claim on Username: {username}, Balance: {balance}")
+            balance = response_json.get('balance')
+            if balance is not None:
+                print(f"Successful claim on Username: {username}, Balance: {balance}")
+            else:
+                print(f"Successful claim on Username: {username}")
         else:
             print(f"Failed to process account {username}. Status Code: {status_code}")
 
