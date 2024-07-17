@@ -1,7 +1,7 @@
 import requests
 import json
 import time
-import datetime
+import re
 
 def read_data(file_name):
     with open(file_name, 'r') as file:
@@ -17,7 +17,11 @@ def send_request(init_data):
         "Content-Type": "application/json"
     }
     response = requests.post(url, data=json.dumps(payload), headers=headers)
-    return response.status_code, response.text
+    return response.status_code, response.json()
+
+def extract_username(init_data):
+    match = re.search(r'username%22%3A%22(.*?)%22', init_data)
+    return match.group(1) if match else None
 
 def countdown(minutes):
     total_seconds = minutes * 60
@@ -27,6 +31,7 @@ def countdown(minutes):
         print(f"Countdown: {timeformat}", end='\r')
         time.sleep(1)
         total_seconds -= 1
+    print()
 
 def main():
     init_data_list = read_data('data.txt')
@@ -34,9 +39,16 @@ def main():
     print(f"Total accounts: {total_accounts}")
 
     for i, init_data in enumerate(init_data_list):
-        print(f"Processing account {i+1}/{total_accounts}")
-        status_code, response_text = send_request(init_data)
-        print(f"Status Code: {status_code}, Response: {response_text}")
+        username = extract_username(init_data)
+        print(f"Processing account {i+1}/{total_accounts} ({username})")
+        status_code, response_json = send_request(init_data)
+        
+        if status_code == 200:
+            balance = response_json.get('balance', 'N/A')
+            print(f"Successful claim on Username: {username}, Balance: {balance}")
+        else:
+            print(f"Failed to process account {username}. Status Code: {status_code}")
+
         time.sleep(5)
 
     print("All accounts processed. Starting 15-minute countdown...")
