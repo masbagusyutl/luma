@@ -44,11 +44,7 @@ def main():
         status_code, response_json = send_request(init_data)
         
         if status_code == 200:
-            # Display key info from the response
-            keys_to_display = ['some_key1', 'some_key2']  # replace with actual keys you want to display
-            display_info = {key: response_json.get(key, 'N/A') for key in keys_to_display}
-            display_info_text = ', '.join([f"{key}: {value}" for key, value in display_info.items()])
-            print(f"Successful claim on Username: {username}. {display_info_text}")
+            print(f"Successful claim on {username}")
         else:
             print(f"Failed to process account {username}. Status Code: {status_code}")
 
